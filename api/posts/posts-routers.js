@@ -39,7 +39,7 @@ router.get("/:id", (req, res) => {
 });
 
 // post insert: ------------------------------------
-router.post("/api/posts", (req, res) => {
+router.post("/", (req, res) => {
   const post = req.body;
   if (!post.title || !post.contents) {
     res.status(400).json({ message: "Please provide title and contents" });
@@ -82,6 +82,20 @@ router.put("/:id", async (req, res) => {
       stack: error.stack,
     });
   }
+});
+
+// post delete by id: -----------------------------------
+
+router.delete("/:id", async (req, res) => {
+  Posts.remove(req.params.id).then((count) => {
+    if (count > 0) {
+      res.status(200).json({ message: "deleted" });
+    } else {
+      res
+        .status(404)
+        .json({ message: "the post with the specified ID does not exist" });
+    }
+  });
 });
 
 module.exports = router;

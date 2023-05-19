@@ -4,11 +4,13 @@
 const express = require("express");
 
 const postsRouter = require("./posts/posts-routers");
+const commentsRouter = require("./posts/comments-routers");
 
 const server = express();
 
 server.use(express.json());
 server.use("/api/posts", postsRouter);
+server.use("/api/posts", commentsRouter);
 
 // end points
 server.get("/", (req, res) => {
