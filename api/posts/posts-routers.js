@@ -10,12 +10,16 @@ const router = express.Router();
 router.get("/", (req, res) => {
   Posts.find(req.query)
     .then((posts) => {
+      if (!posts) {
+        res.status(404);
+      }
       res.status(200).json(posts);
     })
     .catch((error) => {
-      console.log(error);
       res.status(500).json({
         message: "The posts information could not be retrieved",
+        error: error.message,
+        stack: error.stack,
       });
     });
 });
@@ -24,17 +28,20 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   Posts.findById(req.params.id)
     .then((post) => {
-      if (post) {
-        res.status(200).json(post);
-      } else {
+      if (!post) {
         res.status(404).json({
-          message: "The post information could not be retrieved",
+          message: "The post with the specified ID does not exist",
         });
+      } else {
+        res.send.json(post);
       }
     })
     .catch((error) => {
-      console.log(error);
-      res.status(500).json({ message: "Error retrieving the post" });
+      res.status(500).json({
+        message: "The post information could not be retrieved",
+        error: error.message,
+        stack: error.stack,
+      });
     });
 });
 
@@ -60,9 +67,9 @@ router.post("/", (req, res) => {
 
 // post update by id: --------------------------------
 router.put("/:id", async (req, res) => {
+  const possiblePost = await Posts.findById(req.params.id);
+  const post = req.body;
   try {
-    const possiblePost = await Posts.findById(req.params.id);
-    const post = req.body;
     if (!possiblePost) {
       res
         .status(404)
@@ -82,7 +89,7 @@ router.put("/:id", async (req, res) => {
       stack: error.stack,
     });
   }
-});
+}); //
 
 // post delete by id: -----------------------------------
 
